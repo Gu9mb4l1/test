@@ -1,11 +1,3 @@
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-print("       PROJECT GUMBALL")
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-
-print("Discord: https://discord.gg/projectgumball")
-print("Owner Social: https://haunt.gg/gu9mball")
-
-print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 if getgenv().KiciaRebuild and getgenv().KiciaRebuild.Unload then
     pcall(getgenv().KiciaRebuild.Unload)
 end
@@ -2096,19 +2088,30 @@ end
 
 local tbl20 = { "GradientTop", v86[187], v86[70], v86[141] }
 local tbl21 = {}
-local background = v115.Background
-
-for _, v116 in tbl20, nil, nil do
-local v117 = v115[v116]
-tbl21[v116] = { R = v117.R / background.R, G = v117.G / background.G, B = v117.B / background.B }
+-- Original background was pure black, so dividing by its RGB channels
+-- produced invalid multipliers. Use the authored gradient colors as the
+-- reference and tint them from the selected background instead.
+local background = Color3.fromRGB(18, 18, 18)
+for _, token in tbl20, nil, nil do
+local base = v115[token]
+tbl21[token] = { R = base.R / background.R, G = base.G / background.G, B = base.B / background.B }
 end
 
 local function fn38(I,W)if  v115 [I]==W then return;end; v115 [I]=W;local N= tbl18 [I];if N==nil then return;end;for P in N,nil,nil do local N=P._propBindingsByToken[I];if N~=nil then for a,a in N,nil,nil do a.Instance[a.Property]=W;end;end;for a,a in P._gradients,nil,nil do if table.find(a.Tokens,I)~=nil then a.Gradient.Color= fn36 (a.Tokens,a.Times);end;end;N=P._statefulApplyByToken[I];if N~=nil then for l,l in N,nil,nil do l(W);end;end;end;end
 
-local function fn39(arg)
-for _, v116 in tbl20, nil, nil do
-local v117 = tbl21[v116]
-fn38(v116, Color3.new(math.clamp(arg.R * v117.R, v86[186], 1), math.clamp(arg.G * v117.G, 0, 1), math.clamp(arg.B * v117.B, 0, 1)))
+local function fn39(backgroundColor)
+for _, token in tbl20, nil, nil do
+local base = tbl21[token]
+local reference = Color3.fromRGB(18, 18, 18)
+local original = Color3.new(math.clamp(reference.R * base.R, 0, 1), math.clamp(reference.G * base.G, 0, 1), math.clamp(reference.B * base.B, 0, 1))
+-- Keep gradient shading while following the chosen background hue.
+local strength = math.max(original.R, original.G, original.B)
+local color = Color3.new(
+math.clamp(backgroundColor.R + strength * (1 - backgroundColor.R), 0, 1),
+math.clamp(backgroundColor.G + strength * (1 - backgroundColor.G), 0, 1),
+math.clamp(backgroundColor.B + strength * (1 - backgroundColor.B), 0, 1)
+)
+fn38(token, color)
 end
 end
 
@@ -5797,7 +5800,30 @@ v118.connectClick(trove, v135, function()
 arg5.RemoveStop()
 end)
 
-local function repaint(...) end
+local function repaint(immediate)
+local hue = math.clamp(arg3.Hue, 0, 1)
+local sat = math.clamp(arg3.Sat, 0, 1)
+local val = math.clamp(arg3.Val, 0, 1)
+local rgb = Color3.fromHSV(hue, sat, val)
+frame4.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
+frame7.Position = UDim2.fromScale(sat, 1 - val)
+frame7.BackgroundColor3 = rgb
+uiStroke.Color = val > 0.55 and Color3.new(0, 0, 0) or Color3.new(1, 1, 1)
+instance8.Position = UDim2.fromScale(0.5, hue)
+instance10.BackgroundColor3 = rgb
+frame14.Position = UDim2.fromScale(0.5, math.clamp(arg3.Alpha, 0, 1))
+-- These are Roblox TextBox instances, not library widgets.
+-- Writing Text is supported; indexing a missing Set method throws.
+if v131 ~= nil and v131:IsA("TextBox") and not v131:IsFocused() then
+v131.Text = tostring(math.floor((1 - arg3.Alpha) * 100 + 0.5)) .. "%"
+end
+if v132 ~= nil and v132:IsA("TextBox") and not v132:IsFocused() then
+v132.Text = "#" .. rgb:ToHex()
+end
+if arg3.Mode == "Gradient" then
+fn42(immediate)
+end
+end
 tbl22.Repaint = repaint
 
 return {
@@ -17789,10 +17815,13 @@ fn40(v123.Key, v125)
 local v126 = v122:AddColor({
 Label = v123.Label,
 Default = { Rgb = v125, Alpha = 1 },
-Config = config ~= nil and v119.appendPath(arg5, v123.Key) or nil,
+
 OnChanged = function(arg6)
-if config == nil then
+if typeof(arg6) == "table" and typeof(arg6.Rgb) == "Color3" then
 fn40(v123.Key, arg6.Rgb)
+if config ~= nil then
+config:Set(v119.appendPath(arg5, v123.Key), arg6.Rgb)
+end
 end
 end,
 })
@@ -53602,6 +53631,7 @@ tbl17.cF()
 local v116 = tbl17.k()
 local v117 = cloneref(game:GetService("Players"))
 local v118 = cloneref(game:GetService("Workspace"))
+local soundService = cloneref(game:GetService("SoundService"))
 local localPlayer = v117.LocalPlayer
 local tbl18 = { "LeftFoot", "RightFoot" }
 local tbl19 = { "Left Leg", "Right Leg" }
@@ -53626,7 +53656,14 @@ return parent2
 end
 end
 
-return nil
+-- Match audio is sometimes parented directly to a character model.
+if parent:IsA("Model") then
+return parent.PrimaryPart or parent:FindFirstChild("HumanoidRootPart") or parent:FindFirstChildWhichIsA("BasePart", true)
+end
+return parent:FindFirstAncestorWhichIsA("Model") and (function()
+local model = parent:FindFirstAncestorWhichIsA("Model")
+return model.PrimaryPart or model:FindFirstChild("HumanoidRootPart") or model:FindFirstChildWhichIsA("BasePart", true)
+end)() or nil
 end
 
 local function fn37(arg)
@@ -53688,6 +53725,7 @@ _lastPlayedAtBySound = {},
 _activeEffects = {},
 _circlePool = {},
 _footprintPool = {},
+_soundServiceConnection = nil,
 }
 
 setmetatable(tbl20, index2)
@@ -53697,14 +53735,14 @@ end
 
 index2._Initialize = function(arg)
 arg._trove:Connect(v115:GetPropertyChangedSignal({ "SoundVisualizer", "Enabled" }), function(arg2)
-arg:_SetEnabled(arg2)
+arg:_SetEnabled(v115.Data.SoundVisualizer.Enabled)
 end)
 
 arg:_SetEnabled(v115.Data.SoundVisualizer.Enabled)
 end
 
 index2._SetEnabled = function(arg, arg2)
-if arg2 == arg._descendantAddedConnection ~= nil then
+if arg2 == (arg._descendantAddedConnection ~= nil) then
 return
 end
 
@@ -53716,14 +53754,17 @@ end
 end
 
 index2._StartTracking = function(arg)
-arg._descendantAddedConnection = v118.DescendantAdded:Connect(function(descendant)
+local function onAdded(descendant)
 if descendant:IsA("Sound") then
 arg:_TrackSound(descendant)
 end
-end)
-
-for _, v119 in v118:QueryDescendants("Sound") do
-arg:_TrackSound(v119)
+end
+arg._descendantAddedConnection = v118.DescendantAdded:Connect(onAdded)
+arg._soundServiceConnection = soundService.DescendantAdded:Connect(onAdded)
+for _, root in ipairs({v118, soundService}) do
+for _, descendant in ipairs(root:GetDescendants()) do
+onAdded(descendant)
+end
 end
 end
 
@@ -53734,9 +53775,14 @@ return
 end
 arg._descendantAddedConnection = nil
 descendantAddedConnection:Disconnect()
+if arg._soundServiceConnection then
+arg._soundServiceConnection:Disconnect()
+arg._soundServiceConnection = nil
+end
 
 for _, v119 in arg._hooksBySound, nil, nil do
 v119.Played:Disconnect()
+v119.Playing:Disconnect()
 v119.Destroying:Disconnect()
 end
 
@@ -53759,6 +53805,11 @@ end
 while true do
 end
 end),
+Playing = arg2:GetPropertyChangedSignal("Playing"):Connect(function()
+if arg2.Playing then
+arg:_OnPlayed(arg2)
+end
+end),
 Destroying = arg2.Destroying:Connect(function()
 arg:_ForgetSound(arg2)
 end),
@@ -53773,6 +53824,7 @@ end
 arg._hooksBySound[arg2] = nil
 arg._lastPlayedAtBySound[arg2] = nil
 v119.Played:Disconnect()
+v119.Playing:Disconnect()
 v119.Destroying:Disconnect()
 end
 
@@ -53887,8 +53939,11 @@ arg:_PushEffect({ Adornment = v119, IsCircle = false, Elapsed = v86[186], Durati
 end
 
 index2._PassesSourceFilter = function(arg, arg2, arg3)
-if arg2 == "All" or arg3 == nil then
+if arg2 == "All" then
 return true
+end
+if arg3 == nil then
+return false
 end
 local flag19 = arg3 == localPlayer.Character
 if arg2 == "Self" then
@@ -53900,16 +53955,15 @@ return false
 end
 local v119 = arg._fighters.StateByModel[arg3]
 
-if v119 ~= nil then
-if arg2 == "Enemies" and not v119.IsEnemy then
-return v86[153]
+if v119 == nil then
+return false
 end
-
-if arg2 == "Team" and v119.IsEnemy then
-return v86[153]
+if arg2 == "Enemies" then
+return v119.IsEnemy == true
 end
+if arg2 == "Team" then
+return v119.IsEnemy == false
 end
-
 return true
 end
 
@@ -53948,7 +54002,7 @@ return
 end
 local now2 = os.clock()
 local v119 = arg._lastPlayedAtBySound[arg2]
-if v119 ~= nil and now2 - v119 < v86[126] then
+if v119 ~= nil and now2 - v119 < 0.12 then
 return
 end
 arg._lastPlayedAtBySound[arg2] = now2
@@ -53966,22 +54020,40 @@ if rollOffMaxDistance > 0 and magnitude > rollOffMaxDistance then
 return
 end
 local soundVisualizer = v115.Data.SoundVisualizer
-if soundVisualizer.MinVolume > 0 and arg2.Volume < soundVisualizer.MinVolume then
+local audibleVolume = arg2.Volume * (rollOffMaxDistance > 0 and (1 - math.clamp(magnitude / rollOffMaxDistance, 0, 1)) or 1)
+if audibleVolume < soundVisualizer.MinVolume then
 return
 end
 local model = v120:FindFirstAncestorOfClass("Model")
-if not arg:_PassesSourceFilter(soundVisualizer.Source, model) then
+local character = nil
+while model ~= nil do
+if model:FindFirstChildOfClass("Humanoid") then
+character = model
+break
+end
+model = model.Parent and model.Parent:FindFirstAncestorOfClass("Model") or nil
+end
+if not arg:_PassesSourceFilter(soundVisualizer.Source, character) then
 return
 end
-local n = math.clamp(arg2.Volume * (rollOffMaxDistance > 0 and 1 - math.clamp(magnitude / rollOffMaxDistance, 0, v86[63]) or 1), v86[186], 1)
+local n = math.clamp(audibleVolume, 0, 1)
 local n33 = 0.6 + 1.9 * n
-local tbl20 = model ~= nil and fn37(model) or {}
-local flag19 = #tbl20 > 0
-if not soundVisualizer.Types[flag19 and "Footsteps" or "Other"] then
+local feet = character ~= nil and fn37(character) or {}
+local lowerName = string.lower(arg2.Name)
+local isFootstep = character ~= nil and (
+string.find(lowerName, "foot", 1, true) ~= nil
+or string.find(lowerName, "step", 1, true) ~= nil
+or string.find(lowerName, "walk", 1, true) ~= nil
+or string.find(lowerName, "run", 1, true) ~= nil
+or string.find(lowerName, "land", 1, true) ~= nil
+or string.find(lowerName, "movement", 1, true) ~= nil
+)
+local soundType = isFootstep and "Footsteps" or "Other"
+if not soundVisualizer.Types[soundType] then
 return
 end
-local footsteps = flag19 and soundVisualizer.Footsteps or soundVisualizer.Other
-arg:_SpawnVisuals(footsteps.Mode, v120, tbl20, footsteps.UseLoudnessColor and fn38(n) or footsteps.Color, n33)
+local settings = soundVisualizer[soundType]
+arg:_SpawnVisuals(settings.Mode, v120, isFootstep and feet or {}, settings.UseLoudnessColor and fn38(n) or settings.Color, n33)
 end
 
 index2.Destroy = function(arg)
