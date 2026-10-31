@@ -19817,7 +19817,7 @@ return bh.c
 end
 end
 do -- bi
-local function fn35() tbl17 .a3();return{Movement={WalkSpeed={Enabled=false,Speed=2,Keybind={State=false,Kind="Always",Bind=nil,ShowInList=true,Invisible=false}},JumpPower={Enabled=false,Speed=2,Keybind={State=false,Kind="Always",Bind=nil,ShowInList=false,Invisible=false}},Flight={Enabled=false,Speed=100,Keybind={State=false,Kind="Always",Bind=nil,ShowInList=true,Invisible=false}},Sliding={Enabled=false,Speed=10,Keybind={State=false,Kind="Always",Bind=nil,ShowInList=true,Invisible=false}},Noclip={Enabled=false,Keybind={State=false,Kind="Always",Bind=nil,ShowInList=true,Invisible=false}},AutoStrafe={Enabled=false,Speed=50,Keybind={State=false,Kind="Always",Bind=nil,ShowInList=true,Invisible=false}},LongJump={Enabled=false,Keybind={State=false,Kind="Tap",Bind=nil,ShowInList=true,Invisible=false},Mode="Under Feet",Force=60,UpwardVelocity=20,Behind=8},MovementRecorder={Enabled=false,HideUI=false,HideNotifications=false,OpenDistance=3,RenderDistance=50,LookAlignSpeed=180,AlignSnapDistance=0.2,LookSmoothing=35,Record={Keybind={State=false,Kind="Toggle",Bind=nil,ShowInList=true,Invisible=false}},Replay={Keybind={State=false,Kind="Toggle",Bind=nil,ShowInList=true,Invisible=false}}}},Removables={NoFlashbang=false,NoBurnEffect=false,NoAdsVignette=false,NoScopeOverlay=false,NoScopeReticle=false,NoGunTracers=false,NoMuzzleFlash=false,NoHitmarker=false},ThirdPerson={Enabled=false,Keybind={State=false,Kind="Always",Bind=nil,ShowInList=true,Invisible=false},ShowReplica=false,RayCheck=false,X=3,Y=2,Z=6},CameraFov={Enabled=false,Value=70},StretchedResolution={Enabled=false,X=13,Y=10},CustomCrosshair={Enabled=false,Style="Lines",Image={Name="",Size=32,Transparency=0},Length=12,Thickness=2,Gap=6,Outline={Enabled=false,Color=Color3.fromRGB(0,0,0),Thickness=1},Animation={Enabled=false,Kind="Shimmer",Speed=1,Shimmer={Color=Color3.fromRGB(40,40,40)},Perimeter={Color=ColorSequence.new(Color3.fromRGB(255,0,0),Color3.fromRGB(0,0,255))},PingPong={BackgroundColor=Color3.fromRGB(0,0,0),MainColor=Color3.fromRGB(255,255,255),Rotation=0}},Rotation={Enabled=false,Angle=0,Speed=90},Spread={Enabled=false,Range={Min=4,Max=16},Speed=3},Top={Enabled=true,Color=ColorSequence.new(Color3.fromRGB(255,255,255))},Bottom={Enabled=true,Color=ColorSequence.new(Color3.fromRGB(255,255,255))},Left={Enabled=true,Color=ColorSequence.new(Color3.fromRGB(255,255,255))},Right={Enabled=true,Color=ColorSequence.new(Color3.fromRGB(255,255,255))},Text={Enabled=false,Content="",Font="Inconsolata",Size=14,Offset=24,Color=ColorSequence.new(Color3.fromRGB(255,255,255)),Outline={Enabled=false,Color=Color3.fromRGB(0,0,0),Thickness=1},Animation={Enabled=false,Kind="Shimmer",Speed=1,Shimmer={Color=Color3.fromRGB(40,40,40)},Perimeter={Color=ColorSequence.new(Color3.fromRGB(255,0,0),Color3.fromRGB(0,0,255))},PingPong={BackgroundColor=Color3.fromRGB(0,0,0),MainColor=Color3.fromRGB(255,255,255),Rotation=0}}},FollowTarget={Enabled=false,Mode="Crosshair",Speed=20,Damper=1,SnapDistance=5}},AnimationPlayer={Enabled=false,Animation="Cat Girl Bounce",CustomId="",Speed=1,Start=0,End=100},DeviceSpoof={Enabled=false,SpoofType="VR"},PlayerSpoofer={LocalPlayer={Name={Enabled=false,Value="Nosniy"},DisplayName={Enabled=false,Value="Nosniy"},Avatar={Enabled=false,Value="20349956"},Ping={Enabled=false,Value="Low"},Keys={Enabled=false,Value=999},EventCurrency={Enabled=false,Value=9999},Winstreak={Enabled=false,Value=999},Level={Enabled=false,Value=999},CasualWins={Enabled=false,Value=99999},RankedWins={Enabled=false,Value=9999},CasualWinPercent={Enabled=false,Value=100},RankedWinPercent={Enabled=false,Value=100},RankedElo={Enabled=false,Value=3600},LeaderboardRank={Enabled=false,Value=1},FavoriteMap={Enabled=false,Value="Arena"},NametagStatus={Enabled=false,Value="Prime"},Influencer={Enabled=false,Value=true},RobloxEmployee={Enabled=false,Value=true},NosniyTeam={Enabled=false}},OtherPlayers={Name={Enabled=false,Value=""},DisplayName={Enabled=false,Value=""},Avatar={Enabled=false,Value=""},Winstreak={Enabled=false,Value=0},Level={Enabled=false,Value=0},CasualWins={Enabled=false,Value=0},RankedWins={Enabled=false,Value=0},CasualWinPercent={Enabled=false,Value=0},RankedWinPercent={Enabled=false,Value=0},RankedElo={Enabled=false,Value=0},LeaderboardRank={Enabled=false,Value=200},FavoriteMap={Enabled=false,Value=""},NametagStatus={Enabled=false,Value="Prime"},Influencer={Enabled=false},RobloxEmployee={Enabled=false},NosniyTeam={Enabled=false}}}};end
+local function fn35() tbl17 .a3();return{Movement={WalkSpeed={Enabled=false,Speed=2,Keybind={State=false,Kind="Always",Bind=nil,ShowInList=true,Invisible=false}},JumpPower={Enabled=false,Speed=2,Keybind={State=false,Kind="Always",Bind=nil,ShowInList=false,Invisible=false}},Flight={Enabled=false,Speed=100,Keybind={State=false,Kind="Always",Bind=nil,ShowInList=true,Invisible=false}},Sliding={Enabled=false,Speed=10,Keybind={State=false,Kind="Always",Bind=nil,ShowInList=true,Invisible=false}},Noclip={Enabled=false,Keybind={State=false,Kind="Always",Bind=nil,ShowInList=true,Invisible=false}},AutoStrafe={Enabled=false,Speed=50,Keybind={State=false,Kind="Always",Bind=nil,ShowInList=true,Invisible=false}},LongJump={Enabled=false,Keybind={State=false,Kind="Tap",Bind=nil,ShowInList=true,Invisible=false},Mode="Under Feet",Force=60,UpwardVelocity=20,Behind=8},MovementRecorder={Enabled=false,HideUI=false,HideNotifications=false,OpenDistance=3,RenderDistance=50,LookAlignSpeed=180,AlignSnapDistance=0.2,LookSmoothing=35,Record={Keybind={State=false,Kind="Toggle",Bind=nil,ShowInList=true,Invisible=false}},Replay={Keybind={State=false,Kind="Toggle",Bind=nil,ShowInList=true,Invisible=false}}}},Removables={NoFlashbang=false,NoBurnEffect=false,NoAdsVignette=false,NoScopeOverlay=false,NoScopeReticle=false,NoGunTracers=false,NoMuzzleFlash=false,NoHitmarker=false},ThirdPerson={Enabled=false,Keybind={State=false,Kind="Always",Bind=nil,ShowInList=true,Invisible=false},ShowReplica=false,RayCheck=false,X=3,Y=2,Z=6},CameraFov={Enabled=false,Value=70},StretchedResolution={Enabled=false,X=13,Y=10},CustomCrosshair={Enabled=false,Style="Lines",Image={Name="",Size=32,Transparency=0},Length=12,Thickness=2,Gap=6,Outline={Enabled=false,Color=Color3.fromRGB(0,0,0),Thickness=1},Animation={Enabled=false,Kind="Shimmer",Speed=1,Shimmer={Color=Color3.fromRGB(40,40,40)},Perimeter={Color=ColorSequence.new(Color3.fromRGB(255,0,0),Color3.fromRGB(0,0,255))},PingPong={BackgroundColor=Color3.fromRGB(0,0,0),MainColor=Color3.fromRGB(255,255,255),Rotation=0}},Rotation={Enabled=false,Angle=0,Speed=90},Spread={Enabled=false,Range={Min=4,Max=16},Speed=3},Top={Enabled=true,Color=ColorSequence.new(Color3.fromRGB(255,255,255))},Bottom={Enabled=true,Color=ColorSequence.new(Color3.fromRGB(255,255,255))},Left={Enabled=true,Color=ColorSequence.new(Color3.fromRGB(255,255,255))},Right={Enabled=true,Color=ColorSequence.new(Color3.fromRGB(255,255,255))},Text={Enabled=false,Content="",Font="Inconsolata",Size=14,Offset=24,Color=ColorSequence.new(Color3.fromRGB(255,255,255)),Outline={Enabled=false,Color=Color3.fromRGB(0,0,0),Thickness=1},Animation={Enabled=false,Kind="Shimmer",Speed=1,Shimmer={Color=Color3.fromRGB(40,40,40)},Perimeter={Color=ColorSequence.new(Color3.fromRGB(255,0,0),Color3.fromRGB(0,0,255))},PingPong={BackgroundColor=Color3.fromRGB(0,0,0),MainColor=Color3.fromRGB(255,255,255),Rotation=0}}},FollowTarget={Enabled=false,Mode="Crosshair",Speed=20,Damper=1,SnapDistance=5}},AnimationPlayer={Enabled=false,Animation="Cat Girl Bounce",CustomId="",Speed=1,Start=0,End=100},DeviceSpoof={Enabled=false,SpoofType="VR"},CharmSpoof={Enabled=false,Season="Season 0",Rank="Nemesis",Placement=1},PlayerSpoofer={LocalPlayer={Name={Enabled=false,Value="Nosniy"},DisplayName={Enabled=false,Value="Nosniy"},Avatar={Enabled=false,Value="20349956"},Ping={Enabled=false,Value="Low"},Keys={Enabled=false,Value=999},EventCurrency={Enabled=false,Value=9999},Winstreak={Enabled=false,Value=999},Level={Enabled=false,Value=999},CasualWins={Enabled=false,Value=99999},RankedWins={Enabled=false,Value=9999},CasualWinPercent={Enabled=false,Value=100},RankedWinPercent={Enabled=false,Value=100},RankedElo={Enabled=false,Value=3600},LeaderboardRank={Enabled=false,Value=1},FavoriteMap={Enabled=false,Value="Arena"},NametagStatus={Enabled=false,Value="Prime"},Influencer={Enabled=false,Value=true},RobloxEmployee={Enabled=false,Value=true},NosniyTeam={Enabled=false}},OtherPlayers={Name={Enabled=false,Value=""},DisplayName={Enabled=false,Value=""},Avatar={Enabled=false,Value=""},Winstreak={Enabled=false,Value=0},Level={Enabled=false,Value=0},CasualWins={Enabled=false,Value=0},RankedWins={Enabled=false,Value=0},CasualWinPercent={Enabled=false,Value=0},RankedWinPercent={Enabled=false,Value=0},RankedElo={Enabled=false,Value=0},LeaderboardRank={Enabled=false,Value=200},FavoriteMap={Enabled=false,Value=""},NametagStatus={Enabled=false,Value="Prime"},Influencer={Enabled=false},RobloxEmployee={Enabled=false},NosniyTeam={Enabled=false}}}};end
 
 tbl17.bi = function()
 local bi = tbl17.cache.bi
@@ -59828,7 +59828,12 @@ return ir.c
 end
 end
 do -- is
-local function fn35() tbl17 .aE();local I= tbl17 .a2();local W= tbl17 .a7()(I);return function(l)local I=l:AddSection({Title="Device Spoof",Side="left"});I:AddToggle({Label="Enable Device Spoof",Config={"DeviceSpoof","Enabled"}});I:AddDropdown({Label="Presented Platform",Options=W,Config={"DeviceSpoof","SpoofType"}});end;end
+local function fn35() tbl17 .aE();local I= tbl17 .a2();local W= tbl17 .a7()(I);return function(l)local I=l:AddSection({Title="Device Spoof",Side="left"});I:AddToggle({Label="Enable Device Spoof",Config={"DeviceSpoof","Enabled"}});I:AddDropdown({Label="Presented Platform",Options=W,Config={"DeviceSpoof","SpoofType"}});
+local charm=l:AddSection({Title="Charm Spoofer",Side="left"});
+charm:AddToggle({Label="Enable Charm Spoofer",Config={"CharmSpoof","Enabled"}});
+charm:AddDropdown({Label="Season",Options={"Season 0","Season 1","Season 2","Season 3"},Config={"CharmSpoof","Season"}});
+charm:AddDropdown({Label="Rank",Options={"Nemesis","Archnemesis"},Config={"CharmSpoof","Rank"}});
+charm:AddSlider({Label="Top Placement",Min=1,Max=200,Step=1,Config={"CharmSpoof","Placement"}});end;end
 
 tbl17.is = function()
 local is = tbl17.cache.is
@@ -60802,6 +60807,237 @@ end
 return ji.c
 end
 end
+;(function()
+    local Players=game:GetService("Players")
+    local ReplicatedStorage=game:GetService("ReplicatedStorage")
+    local LocalPlayer=Players.LocalPlayer
+    local seasonCfg={}
+    local seasonNames={[0]="Zero",[1]="Warp",[2]="Polar",[3]="Fame"}
+    local seasonByName={Zero=0,Warp=1,Polar=2,Fame=3}
+    local seasonLib,seasonOriginal,seasonReplacement,fighterController
+    local seasonRecords=setmetatable({}, {__mode="k"})
+    local function seasonNumber(value)
+        if type(value)=="number" then return value end
+        if type(value)~="string" then return nil end
+        return seasonByName[value] or tonumber(value:match("^Season (%d+)$")) or tonumber(value)
+    end
+    local function resolveSeasonLibrary()
+        if seasonLib then return seasonLib end
+        local ok,result=pcall(function()
+            local modules=ReplicatedStorage:FindFirstChild("Modules")
+            local module=modules and modules:FindFirstChild("SeasonLibrary")
+            if module then return require(module) end
+        end)
+        if ok and type(result)=="table" then seasonLib=result end
+        return seasonLib
+    end
+    local function seasonRankProfile(index)
+        local lib=resolveSeasonLibrary()
+        local season=lib and lib.Seasons and lib.Seasons[seasonNames[index]]
+        return season and season.RankProfile
+    end
+    local function resolveRankName(index,rank)
+        local profile=seasonRankProfile(index)
+        if not profile or type(profile.Ranks)~="table" then return nil end
+        if profile.Ranks[rank] then return rank end
+        local normalized=tostring(rank):lower():gsub("[^%a]","")
+        for name in pairs(profile.Ranks) do
+            if tostring(name):lower():gsub("[^%a]","")==normalized then return name end
+        end
+        return nil
+    end
+    local function seasonMetadata(value)
+        local index=seasonNumber(value)
+        local cfg=index~=nil and seasonCfg[index] or nil
+        if not cfg or not cfg.enabled then return nil end
+        local profile=seasonRankProfile(index)
+        local rank=profile and profile.Ranks and profile.Ranks[cfg.rankName]
+        if not rank then return nil end
+        return {SeasonELO=rank.RequiredELO,SeasonLeaderboardRank=rank.RequiredELOLeaderboardRanking and cfg.rank or nil}
+    end
+    local function recordSeasonCharm(model,season,elo,arch,hasNativeData)
+        local saved=seasonRecords[model]
+        if saved then return saved end
+        saved={season=season,elo=elo,arch=arch,native=hasNativeData,labels={}}
+        local extra=model:FindFirstChild("Extra")
+        saved.extra=extra and extra:Clone()
+        for _,object in ipairs(model:GetDescendants()) do
+            if object:HasTag("CharmLeaderboardRank") then
+                pcall(function() saved.labels[object]=object.Text end)
+            end
+        end
+        seasonRecords[model]=saved
+        return saved
+    end
+    local function restoreCharmRankGeometry(model,season,md)
+        if not seasonLib or type(seasonLib.GetRank)~="function" then return end
+        local profile=seasonLib.Seasons and seasonLib.Seasons[season]
+        if not profile or not profile.RankProfile then return end
+        local ok,rank=pcall(seasonLib.GetRank,seasonLib,md.SeasonELO,nil,md.SeasonLeaderboardRank or math.huge,profile.RankProfile.Name)
+        if not ok or type(rank)~="string" then return end
+        local extra=model:FindFirstChild("Extra")
+        if not extra or extra:FindFirstChild(rank) then return end
+        local scripts=LocalPlayer and LocalPlayer:FindFirstChild("PlayerScripts")
+        local assets=scripts and scripts:FindFirstChild("Assets")
+        local charms=assets and assets:FindFirstChild("Charms")
+        local template=charms and charms:FindFirstChild(model.Name)
+        local source=template and template:FindFirstChild("Extra")
+        local shape=source and source:FindFirstChild(rank)
+        if shape then shape:Clone().Parent=extra end
+    end
+    local function resolveFighterController()
+        if fighterController then return fighterController end
+        pcall(function()
+            local scripts=LocalPlayer:FindFirstChild("PlayerScripts")
+            local controllers=scripts and scripts:FindFirstChild("Controllers")
+            local module=controllers and controllers:FindFirstChild("FighterController")
+            if module then fighterController=require(module) end
+        end)
+        return fighterController
+    end
+    local function equippedViewmodelRoot()
+        local controller=resolveFighterController()
+        if not controller then return nil end
+        local fighter=controller.LocalFighter
+        if not fighter and type(controller.GetFighter)=="function" then
+            pcall(function() fighter=controller:GetFighter(LocalPlayer) end)
+        end
+        local item=fighter and fighter.EquippedItem
+        local vm=item and item.ViewModel
+        return vm and (vm.Model or vm._model) or nil
+    end
+    local function installSeasonHook()
+        local lib=resolveSeasonLibrary()
+        if not lib then return false end
+        if seasonReplacement and lib.FormatSeasonRankCharm==seasonReplacement then return true end
+        if type(lib.FormatSeasonRankCharm)~="function" then return false end
+        seasonOriginal=lib.FormatSeasonRankCharm
+        local original=seasonOriginal
+        local replacement=function(self,model,season,elo,arch,...)
+            local md=seasonMetadata(season)
+            if md and typeof(model)=="Instance" then
+                if not seasonRecords[model] then recordSeasonCharm(model,season,elo,arch,true) end
+                restoreCharmRankGeometry(model,season,md)
+                elo,arch=md.SeasonELO,md.SeasonLeaderboardRank
+            end
+            return original(self,model,season,elo,arch,...)
+        end
+        local ok=pcall(function() lib.FormatSeasonRankCharm=replacement end)
+        if ok and lib.FormatSeasonRankCharm==replacement then
+            seasonReplacement=replacement
+            return true
+        end
+        return false
+    end
+    local function restoreSeasonCharm(model,saved)
+        if typeof(model)=="Instance" and model.Parent then
+            if saved.extra then
+                local extra=model:FindFirstChild("Extra")
+                if extra then extra:Destroy() end
+                saved.extra.Parent=model
+                saved.extra=nil
+            end
+            for label,value in pairs(saved.labels or {}) do
+                if label.Parent then pcall(function()label.Text=value end) end
+            end
+            if saved.native and type(seasonOriginal)=="function" then
+                pcall(seasonOriginal,seasonLib,model,saved.season,saved.elo,saved.arch)
+            end
+        end
+        if saved.extra then saved.extra:Destroy() end
+    end
+    local function restoreSeasonCharms()
+        for model,saved in pairs(seasonRecords) do restoreSeasonCharm(model,saved) end
+        table.clear(seasonRecords)
+    end
+    local function refreshSeasonCharms()
+        if not installSeasonHook() then return end
+        if type(seasonOriginal)~="function" then return end
+        for model,saved in pairs(seasonRecords) do
+            if typeof(model)=="Instance" and model.Parent then
+                local md=seasonMetadata(saved.season)
+                if md then
+                    restoreCharmRankGeometry(model,saved.season,md)
+                    local ok,err=pcall(seasonOriginal,seasonLib,model,saved.season,md.SeasonELO,md.SeasonLeaderboardRank)
+                    if not ok then warn("[Gumball Charm] Format: "..tostring(err)) end
+                else
+                    restoreSeasonCharm(model,saved)
+                    seasonRecords[model]=nil
+                end
+            else
+                restoreSeasonCharm(model,saved)
+                seasonRecords[model]=nil
+            end
+        end
+        local roots={equippedViewmodelRoot(),workspace.CurrentCamera,LocalPlayer.Character}
+        local seen=setmetatable({}, {__mode="k"})
+        local function restyle(model)
+            if typeof(model)~="Instance" or not model:IsA("Model") or seen[model] then return end
+            seen[model]=true
+            local index=seasonNumber(model.Name)
+            if index==nil then return end
+            local md=seasonMetadata(index)
+            if not md then return end
+            local saved=seasonRecords[model]
+            local season=saved and saved.season or seasonNames[index]
+            if not saved then recordSeasonCharm(model,season,nil,nil,false) end
+            restoreCharmRankGeometry(model,season,md)
+            local ok,err=pcall(seasonOriginal,seasonLib,model,season,md.SeasonELO,md.SeasonLeaderboardRank)
+            if not ok then warn("[Gumball Charm] Format: "..tostring(err)) end
+        end
+        for _,root in ipairs(roots) do
+            if typeof(root)=="Instance" then
+                restyle(root)
+                for _,model in ipairs(root:GetDescendants()) do restyle(model) end
+            end
+        end
+    end
+    for i=0,3 do seasonCfg[i]={enabled=false,rankName="Nemesis",rank=1} end
+    local function setRankedCharm(index,rank,top,enabled)
+        if not seasonCfg[index] then return false,"Unknown season" end
+        local rankName=resolveRankName(index,rank)
+        if enabled and not rankName then return false,"Rank not available in Season "..index..": "..tostring(rank) end
+        for i=0,3 do seasonCfg[i].enabled=false end
+        restoreSeasonCharms()
+        if enabled then
+            seasonCfg[index]={enabled=true,rankName=rankName,rank=math.clamp(math.floor(tonumber(top) or 1),1,200)}
+            refreshSeasonCharms()
+        end
+        return true
+    end
+    tbl17._InitCharmSpoof=function(store)
+        local function apply()
+            local data=store and store.Data and store.Data.CharmSpoof
+            if not data or not data.Enabled then
+                for i=0,3 do seasonCfg[i].enabled=false end
+                restoreSeasonCharms()
+                return
+            end
+            local index=seasonNumber(data.Season) or 0
+            local ok,reason=setRankedCharm(index,data.Rank or "Nemesis",data.Placement,true)
+            if not ok then warn("[Gumball Charm] "..tostring(reason)) end
+        end
+        for _,field in ipairs({"Enabled","Season","Rank","Placement"}) do
+            local ok,signal=pcall(function()return store:GetPropertyChangedSignal({"CharmSpoof",field})end)
+            if ok and signal then signal:Connect(function()
+                local success,err=pcall(apply)
+                if not success then warn("[Gumball Charm] Update: "..tostring(err)) end
+            end) end
+        end
+        task.defer(function()
+            local ok,err=pcall(apply)
+            if not ok then warn("[Gumball Charm] Init: "..tostring(err)) end
+            while task.wait(1) do
+                local data=store and store.Data and store.Data.CharmSpoof
+                if data and data.Enabled then
+                    local success,why=pcall(refreshSeasonCharms)
+                    if not success then warn("[Gumball Charm] Refresh: "..tostring(why)) end
+                end
+            end
+        end)
+    end
+end)()
+
 do -- jj
 local function fn35()
 local v115 = tbl17.ji()
@@ -66515,6 +66751,7 @@ end })
 
 local boot = (function()
     local store = tbl17.bG()
+    if tbl17._InitCharmSpoof then tbl17._InitCharmSpoof(store) end
     local profiles = GlobalTrove:Add(tbl17.bN().new(store))
     store:UseMiddleware(profiles)
     local fonts = tbl17.az()
