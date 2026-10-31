@@ -28796,7 +28796,7 @@ end
 if arg.EnumType == Enum.KeyCode then
 return v86[34]
 end
-return arg.EnumType == Enum.KeyCode or arg.EnumType == Enum.UserInputType and arg == Enum.UserInputType.MouseButton1 and arg == Enum.UserInputType.MouseButton2 and arg == Enum.UserInputType.MouseButton3
+return arg.EnumType == Enum.KeyCode or (arg.EnumType == Enum.UserInputType and (arg == Enum.UserInputType.MouseButton1 or arg == Enum.UserInputType.MouseButton2 or arg == Enum.UserInputType.MouseButton3))
 end
 
 local function fn38(arg)
@@ -28836,8 +28836,39 @@ return v117.VoidOk
 end
 local v121 = v116.NavigateTo(arg3, arg4)
 if not tbl19.isKeybindConfig(v121) then
-local str7 = table.concat(arg4, ".")
-return v117.err("KeybindRegistry", "registerPath", string.format("invalid keybind configuration at path `%s`", tostring(str7)))
+-- Repair only malformed keybind fields (e.g. after loading JSON).
+-- Preserve valid user-selected modes and binds.
+local path = table.concat(arg4, ".")
+if type(v121) ~= "table" then
+return v117.err("KeybindRegistry", "registerPath", string.format("invalid keybind configuration at path `%s`", path))
+end
+local base = arg4
+local function repair(field, value)
+local fieldPath = v119(arg4, { field })
+arg.Set(fieldPath, value)
+v121[field] = value
+end
+if type(v121.State) ~= "boolean" then
+repair("State", false)
+end
+if not fn36(v121.Kind) then
+repair("Kind", "Hold")
+end
+if v121.Bind ~= nil and not fn37(v121.Bind) then
+local bind = v121.Bind
+if type(bind) == "string" then
+local keyName = bind:match("^Enum%.KeyCode%.(.+)$") or bind:match("^KeyCode%.(.+)$")
+local mouseName = bind:match("^Enum%.UserInputType%.(MouseButton[123])$") or bind:match("^UserInputType%.(MouseButton[123])$")
+local parsed = (keyName and Enum.KeyCode[keyName]) or (mouseName and Enum.UserInputType[mouseName])
+if parsed and fn37(parsed) then bind = parsed else bind = nil end
+else
+bind = nil
+end
+repair("Bind", bind)
+end
+if not tbl19.isKeybindConfig(v121) then
+return v117.err("KeybindRegistry", "registerPath", string.format("invalid keybind configuration at path `%s`", path))
+end
 end
 local v122 = fn38(arg4)
 local v123 = v119(arg4, { "State" })
