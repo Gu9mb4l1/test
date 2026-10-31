@@ -1,3 +1,11 @@
+print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+print("       PROJECT GUMBALL")
+print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+
+print("Discord: https://discord.gg/projectgumball")
+print("Owner Social: https://haunt.gg/gu9mball")
+
+print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
 if getgenv().KiciaRebuild and getgenv().KiciaRebuild.Unload then
     pcall(getgenv().KiciaRebuild.Unload)
 end
