@@ -17776,14 +17776,14 @@ end
 
 fn40(v123.Key, v125)
 
+-- Use the shared color/config binding so the theme picker writes through
+-- the same path as other color controls and stays synchronized with the theme.
 local v126 = v122:AddColor({
 Label = v123.Label,
 Default = { Rgb = v125, Alpha = 1 },
+Config = config ~= nil and v119.appendPath(arg5, v123.Key) or nil,
 OnChanged = function(arg6)
-if config ~= nil then
-local rgb = arg6.Rgb
-config:Set(v119.appendPath(arg5, v123.Key), rgb)
-else
+if config == nil then
 fn40(v123.Key, arg6.Rgb)
 end
 end,
@@ -57513,6 +57513,7 @@ local function fn35()
 local v115 = tbl17.bG()
 local v116 = tbl17.k()
 local v117 = cloneref(game:GetService("Lighting"))
+local mouseInput = game:GetService("UserInputService")
 local index2 = {}
 index2.__index = index2
 
@@ -57531,8 +57532,6 @@ arg:_Rebuild()
 end
 
 trove:Connect(v115:GetPropertyChangedSignal({ "MotionBlur", "Enabled" }), fn36)
-trove:Connect(v115:GetPropertyChangedSignal({ "MotionBlur", "Intensity" }), fn36)
-trove:Connect(v115:GetPropertyChangedSignal({ "MotionBlur", "Sensitivity" }), fn36)
 
 if v115.Data.MotionBlur.Enabled then
 arg:_Rebuild()
@@ -57561,29 +57560,22 @@ v118:Add(blurEffect)
 arg._blurEffect = blurEffect
 end
 
-local function fn36(arg, arg2, arg3)
-local n = (arg.Position - arg2.Position).Magnitude / arg3
-local v118, v119 = arg:ToObjectSpace(arg2):ToAxisAngle()
-return n * v86[126] + math.abs(v119) / arg3 * 3
-end
-
 index2._OnPreRender = function(arg, arg2)
 local blurEffect = arg._blurEffect
 if blurEffect == nil then
 return
 end
-local currentCamera = workspace.CurrentCamera
-if currentCamera == nil then
-return
-end
 local motionBlur = v115.Data.MotionBlur
-local cFrame = currentCamera.CFrame
-local lastCameraCFrame = arg._lastCameraCFrame
-arg._lastCameraCFrame = cFrame
-if lastCameraCFrame == nil then
-return
-end
-blurEffect.Size = blurEffect.Size + (math.clamp(fn36(cFrame, lastCameraCFrame, arg2) * motionBlur.Sensitivity, 0, motionBlur.Intensity) - blurEffect.Size) * math.min(1, arg2 * v86[149])
+local mouseDelta = mouseInput:GetMouseDelta().Magnitude
+local frameTime = math.max(arg2 or 0, 1 / 240)
+-- Mouse movement only: walking, jumping and camera position changes do not add blur.
+-- Normalize against 60 FPS so sensitivity behaves consistently at different frame rates.
+local movement = mouseDelta / (frameTime * 60)
+local target = math.clamp(movement * motionBlur.Sensitivity * 0.65, 0, motionBlur.Intensity)
+-- Smooth rise and quick fade when the mouse stops moving.
+local response = target > blurEffect.Size and 22 or 14
+local alpha = 1 - math.exp(-response * frameTime)
+blurEffect.Size = blurEffect.Size + (target - blurEffect.Size) * alpha
 end
 
 index2.PreRender = function(arg, arg2)
