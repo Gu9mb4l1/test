@@ -57545,106 +57545,42 @@ end
 end
 
 index2._Rebuild = function(arg)
-local activeTrove = arg._activeTrove
-
-if activeTrove ~= nil then
+if arg._activeTrove then
+arg._activeTrove:Destroy()
 arg._activeTrove = nil
-arg._edgeGui = nil
-arg._edgeLayers = nil
-arg._edgeStrength = 0
-arg._blurEffect = nil
-activeTrove:Destroy()
 end
-
+arg._blurEffect = nil
+arg._edgeStrength = 0
 if not v115.Data.MotionBlur.Enabled then
 return
 end
-local v118 = arg._trove:Extend()
-arg._activeTrove = v118
--- Edge-only visual motion effect. Roblox BlurEffect is full-screen, so use
--- feathered, non-interactive edge overlays instead of blurring the whole world.
-local gui = Instance.new("ScreenGui")
-gui.Name = "GumballEdgeMotion"
-gui.IgnoreGuiInset = true
-gui.ResetOnSpawn = false
-gui.DisplayOrder = 0
-gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-gui.Parent = v117
-v118:Add(gui)
-arg._edgeGui = gui
-arg._edgeLayers = {}
-arg._edgeStrength = 0
+local activeTrove = arg._trove:Extend()
+arg._activeTrove = activeTrove
 local blur = Instance.new("BlurEffect")
 blur.Name = "GumballMotionBlur"
 blur.Size = 0
 blur.Enabled = true
 blur.Parent = game:GetService("Lighting")
-v118:Add(blur)
+activeTrove:Add(blur)
 arg._blurEffect = blur
-
--- Transparent light streaks, not dark overlays. Roblox has no native
--- per-side screen blur; this provides a directional edge-motion approximation.
-for _, side in ipairs({"Left", "Right"}) do
-local container = Instance.new("Frame")
-container.Name = side .. "MotionEdge"
-container.BackgroundTransparency = 1
-container.BorderSizePixel = 0
-container.Active = false
-container.Size = UDim2.fromScale(0.24, 1)
-container.Position = side == "Left" and UDim2.fromScale(0, 0) or UDim2.fromScale(0.76, 0)
-container.Parent = gui
-local streaks = {}
-for i = 1, 9 do
-local streak = Instance.new("Frame")
-streak.Name = "Streak" .. i
-streak.BackgroundColor3 = Color3.fromRGB(215, 230, 255)
-streak.BackgroundTransparency = 1
-streak.BorderSizePixel = 0
-streak.Active = false
-streak.Size = UDim2.new(1, 0, 0, 1 + (i % 3))
-streak.Position = UDim2.fromScale(0, (i - 0.5) / 9)
-streak.Parent = container
-local gradient = Instance.new("UIGradient")
-gradient.Rotation = side == "Left" and 0 or 180
-gradient.Transparency = NumberSequence.new({
-NumberSequenceKeypoint.new(0, 0.48),
-NumberSequenceKeypoint.new(0.22, 0.72),
-NumberSequenceKeypoint.new(1, 1)
-})
-gradient.Parent = streak
-streaks[i] = streak
-end
-arg._edgeLayers[side] = { Container = container, Streaks = streaks }
-end
 end
 
-index2._OnPreRender = function(arg, arg2)
-local layers = arg._edgeLayers
-if layers == nil then
+index2._OnPreRender = function(arg, dt)
+local blur = arg._blurEffect
+if not blur then
 return
 end
-local motionBlur = v115.Data.MotionBlur
-local delta = mouseInput:GetMouseDelta()
-local frameTime = math.max(arg2 or 0, 1 / 240)
--- Positive X = turning right; negative X = turning left.
-local horizontal = delta.X / (frameTime * 60)
-local intensity = math.clamp(motionBlur.Intensity, 0, 100) / 100
-local target = math.clamp(math.abs(horizontal) * motionBlur.Sensitivity * 0.14, 0, 1)
-target = target * intensity
-local signedTarget = horizontal >= 0 and target or -target
-local previous = arg._edgeStrength
-local alpha = 1 - math.exp(-(math.abs(signedTarget) > math.abs(previous) and 22 or 13) * frameTime)
-arg._edgeStrength = previous + (signedTarget - previous) * alpha
-for side, layer in pairs(layers) do
-local active = side == "Right" and math.max(arg._edgeStrength, 0) or math.max(-arg._edgeStrength, 0)
-local width = math.clamp(0.04 + 0.96 * intensity, 0, 1)
-layer.Container.Size = UDim2.fromScale(width, 1)
-layer.Container.Position = side == "Left" and UDim2.fromScale(0, 0) or UDim2.fromScale(1 - width, 0)
-for i, streak in ipairs(layer.Streaks) do
-streak.BackgroundTransparency = 1 - active * (0.12 + 0.10 * (i % 3) / 2)
-streak.Size = UDim2.new(1, 0, 0, 1 + math.floor(active * (3 + i % 3)))
-end
-end
+local settings = v115.Data.MotionBlur
+local frameTime = math.max(dt or 0, 1 / 240)
+local horizontal = mouseInput:GetMouseDelta().X
+local intensity = math.clamp(settings.Intensity or 0, 0, 100) / 100
+local sensitivity = math.max(settings.Sensitivity or 0, 0)
+-- Both turning directions activate actual blur; no overlay lines.
+local motion = math.abs(horizontal) / (frameTime * 60)
+local target = math.clamp(motion * sensitivity * 0.14, 0, 1) * intensity
+local smoothing = 1 - math.exp(-(target > arg._edgeStrength and 22 or 13) * frameTime)
+arg._edgeStrength = arg._edgeStrength + (target - arg._edgeStrength) * smoothing
+blur.Size = math.clamp(56 * arg._edgeStrength, 0, 56)
 end
 
 index2.PreRender = function(arg, arg2)
