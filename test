@@ -1,10 +1,7 @@
 --[[
-    PROJECT GUMBALL / CONTROL DECK v2
-    Original standalone dark-only UI. No Kicia, UE, or external UI libraries.
-    Top navigation: Main, ESP, World, Visuals, Player, Misc, Cosmatic, Settings.
-    All feature controls are UI-only previews; they do not modify gameplay.
-    Settings > Session > Unload Gumball removes all of this script's UI,
-    input listeners, scheduled notifications, and registered cleanups.
+    PROJECT GUMBALL / CONTROL DECK
+    Original UI-only prototype. No Kicia, UE, or external UI libraries.
+    All module controls are demonstration state; they do not change gameplay.
     PC: RightShift to show/hide, Ctrl+K to search.
     Mobile: floating G button; selecting a module opens its inspector.
 ]]
@@ -33,8 +30,13 @@ local C = {
     white = Color3.fromRGB(247, 248, 245),
     muted = Color3.fromRGB(151, 163, 170),
     faint = Color3.fromRGB(104, 119, 129),
-    accent = Color3.fromRGB(232, 238, 246),
-    green = Color3.fromRGB(170, 185, 197),
+    accent = Color3.fromRGB(255, 190, 106),
+    green = Color3.fromRGB(125, 220, 181),
+}
+local accentPalettes = {
+    Amber = Color3.fromRGB(255, 190, 106),
+    Mint = Color3.fromRGB(125, 220, 181),
+    Rose = Color3.fromRGB(250, 143, 167),
 }
 local font = Enum.Font.Cartoon
 local globalConnections = {}
@@ -42,35 +44,31 @@ local inspectorConnections = {}
 local browserConnections = {}
 local changeListeners = {}
 local states = {}
-local activeSection = "Main"
+local activeSection = "Home"
 local activeModule = nil
 local compact = false
 local mobileView = "browser"
 local alive = true
 local toastGeneration = 0
-local toastTask = nil
-local toastTween = nil
-local toastComplete = nil
-local cleanupHandlers = {}
 
 local sections = {
-    {id = "Main",     label = "Main"},
-    {id = "ESP",      label = "ESP"},
-    {id = "World",    label = "World"},
-    {id = "Visuals",  label = "Visuals"},
-    {id = "Player",   label = "Player"},
-    {id = "Misc",     label = "Misc"},
-    {id = "Cosmatic", label = "Cosmatic"},
-    {id = "Settings", label = "Settings"},
+    {id = "Home",     code = "HM", label = "Home"},
+    {id = "Combat",   code = "CB", label = "Combat"},
+    {id = "ESP",      code = "ES", label = "ESP"},
+    {id = "Visuals",  code = "VS", label = "Visuals"},
+    {id = "World",    code = "WD", label = "World"},
+    {id = "Player",   code = "PL", label = "Player"},
+    {id = "Utility",  code = "UT", label = "Utility"},
+    {id = "Settings", code = "CF", label = "Settings"},
 }
 
 local modules = {
-    {id="welcome", section="Main", title="Workspace", summary="Your Gumball starting point", detail="Browse features on the left and inspect settings on the right."},
-    {id="roadmap", section="Main", title="Build Roadmap", summary="Plan features to add next", detail="Connect each module to its own Luau implementation after approving the menu."},
-    {id="aim", section="Main", title="Aim Controls", summary="Targeting and response settings", detail="A dedicated space for aiming options and input behavior."},
-    {id="trigger", section="Main", title="Trigger Assist", summary="Activation and timing", detail="A future module for trigger-related options."},
-    {id="weapons", section="Main", title="Weapon Tuning", summary="Weapon-specific configuration", detail="A future workspace for weapon behavior and preferences."},
-    {id="tower", section="Main", title="Z-Tower", summary="Zombie Tower controls", detail="A separate area reserved for Tower-specific features."},
+    {id="welcome", section="Home", title="Workspace", summary="Your new Gumball starting point", detail="An original three-panel workspace. Browse modules on the left and inspect their controls on the right."},
+    {id="roadmap", section="Home", title="Build Roadmap", summary="Plan the features we add next", detail="We will connect each module to its own Luau implementation after approving the menu."},
+    {id="aim", section="Combat", title="Aim Controls", summary="Targeting and response settings", detail="A dedicated space for aiming options and input behavior."},
+    {id="trigger", section="Combat", title="Trigger Assist", summary="Activation and timing", detail="A future module for trigger-related options."},
+    {id="weapons", section="Combat", title="Weapon Tuning", summary="Weapon-specific configuration", detail="A future workspace for weapon behavior and preferences."},
+    {id="tower", section="Combat", title="Z-Tower", summary="Zombie Tower controls", detail="A separate area reserved for Tower-specific features."},
     {id="players", section="ESP", title="Player Overlay", summary="Names, boxes, distance", detail="A future inspector for player information overlays."},
     {id="highlight", section="ESP", title="Highlights", summary="Outline and fill styles", detail="A future inspector for highlight styling."},
     {id="indicators", section="ESP", title="Indicators", summary="On-screen status elements", detail="A future inspector for directional and status indicators."},
@@ -83,14 +81,10 @@ local modules = {
     {id="movement", section="Player", title="Movement", summary="Character movement options", detail="A future inspector for movement-related settings."},
     {id="identity", section="Player", title="Identity", summary="Local display preferences", detail="A future inspector for display-name and identity styling."},
     {id="character", section="Player", title="Character", summary="Local character appearance", detail="A future inspector for character presentation."},
-    {id="tools", section="Misc", title="Quick Tools", summary="Useful session actions", detail="A future workspace for quick utilities."},
-    {id="automation", section="Misc", title="Automation", summary="Match and loadout helpers", detail="A future workspace for automation options."},
-    {id="skins", section="Cosmatic", title="Skins", summary="Cosmetic skin options", detail="A future inspector for local cosmetic appearance."},
-    {id="wraps", section="Cosmatic", title="Wraps", summary="Weapon wrap options", detail="A future inspector for weapon wrap styling."},
-    {id="charms", section="Cosmatic", title="Charms", summary="Charm appearance options", detail="A future inspector for cosmetic charms."},
-    {id="finishers", section="Cosmatic", title="Finishers", summary="Finisher appearance options", detail="A future inspector for cosmetic finishers."},
+    {id="tools", section="Utility", title="Quick Tools", summary="Useful session actions", detail="A future workspace for quick utilities."},
+    {id="automation", section="Utility", title="Automation", summary="Match and loadout helpers", detail="A future workspace for automation options."},
+    {id="appearance", section="Settings", title="Appearance", summary="Theme and interface styling", detail="These appearance controls affect the Gumball UI itself."},
     {id="session", section="Settings", title="Session", summary="Menu and unload controls", detail="Control the menu visibility and remove the interface cleanly."},
-    {id="appearance", section="Settings", title="Interface", summary="Dark appearance and layout", detail="The menu uses one fixed dark theme; only layout preferences can be adjusted."},
 }
 
 local function make(className, parent, properties)
@@ -175,49 +169,48 @@ local window = rounded(make("Frame", screen, {
 }), 15)
 stroked(window, C.line)
 
--- Compact horizontal navigation sits directly beside the Gumball title.
--- Only the title area is draggable, so dragging never steals tab clicks.
+-- The header is a drag surface, not a row of tabs.
 local header = make("Frame", window, {
     Name="Header", Size=UDim2.new(1,0,0,56), BackgroundColor3=C.rail,
     BorderSizePixel=0, Active=true,
 })
 local dragHandle = make("Frame", header, {
-    Name="DragArea", Position=UDim2.fromOffset(0,0),
-    Size=UDim2.fromOffset(155,56), BackgroundTransparency=1, Active=true,
+    Name="DragArea", Size=UDim2.new(1,-96,1,0), BackgroundTransparency=1,
+    Active=true,
 })
-local logo = label(dragHandle, "Gumball", 27, C.white, {
-    Position=UDim2.fromOffset(17,5), Size=UDim2.fromOffset(125,43),
+local logo = label(dragHandle, "GUMBALL", 27, C.white, {
+    Position=UDim2.fromOffset(18,4), Size=UDim2.fromOffset(174,44),
 })
 local dot = rounded(make("Frame", dragHandle, {
-    Position=UDim2.fromOffset(131,26), Size=UDim2.fromOffset(6,6),
+    Position=UDim2.fromOffset(163,22), Size=UDim2.fromOffset(7,7),
     BackgroundColor3=C.accent, BorderSizePixel=0,
-}), 3)
+}), 4)
 markAccent(dot, "BackgroundColor3", true)
-
-local tabScroll = make("ScrollingFrame", header, {
-    Name="TopTabs", Position=UDim2.fromOffset(156,4),
-    Size=UDim2.new(1,-250,0,48), BackgroundTransparency=1,
-    BorderSizePixel=0, ScrollBarThickness=0,
-    AutomaticCanvasSize=Enum.AutomaticSize.X,
-    CanvasSize=UDim2.fromOffset(0,0),
-    ScrollingDirection=Enum.ScrollingDirection.X,
-    ClipsDescendants=true, Active=true,
-})
-make("UIListLayout", tabScroll, {
-    FillDirection=Enum.FillDirection.Horizontal,
-    HorizontalAlignment=Enum.HorizontalAlignment.Left,
-    VerticalAlignment=Enum.VerticalAlignment.Center,
-    Padding=UDim.new(0,4), SortOrder=Enum.SortOrder.LayoutOrder,
+label(dragHandle, "CONTROL DECK  /  01", 12, C.muted, {
+    Position=UDim2.fromOffset(194,12), Size=UDim2.fromOffset(210,32),
 })
 local hide = textButton(header, "HIDE", {
     AnchorPoint=Vector2.new(1,.5), Position=UDim2.new(1,-14,.5,0),
-    Size=UDim2.fromOffset(68,30), TextSize=12, BackgroundColor3=C.tile,
+    Size=UDim2.fromOffset(69,31), TextSize=12, BackgroundColor3=C.tile,
     TextColor3=C.muted,
 })
 line(window, UDim2.fromOffset(0,55), UDim2.new(1,0,0,1))
 
+local rail = make("Frame", window, {
+    Name="Rail", Position=UDim2.fromOffset(0,56), Size=UDim2.new(0,78,1,-86),
+    BackgroundColor3=C.rail, BorderSizePixel=0,
+})
+local railScroll = make("ScrollingFrame", rail, {
+    Name="Sections", Position=UDim2.fromOffset(6,8), Size=UDim2.new(1,-12,1,-16),
+    BackgroundTransparency=1, BorderSizePixel=0, ScrollBarThickness=0,
+    AutomaticCanvasSize=Enum.AutomaticSize.Y, CanvasSize=UDim2.fromOffset(0,0),
+    ScrollingDirection=Enum.ScrollingDirection.Y,
+})
+make("UIListLayout", railScroll, {Padding=UDim.new(0,6), SortOrder=Enum.SortOrder.LayoutOrder})
+line(window, UDim2.fromOffset(77,56), UDim2.new(0,1,1,-86)).Name="RailDivider"
+
 local browser = make("Frame", window, {
-    Name="Browser", Position=UDim2.fromOffset(0,56), Size=UDim2.new(0,340,1,-86),
+    Name="Browser", Position=UDim2.fromOffset(78,56), Size=UDim2.new(0,313,1,-86),
     BackgroundColor3=C.base, BorderSizePixel=0,
 })
 local browserHeader = make("Frame", browser, {
@@ -228,7 +221,7 @@ local browserEyebrow = label(browserHeader, "MODULE LIBRARY", 11, C.accent, {
 })
 browserEyebrow.Name="Eyebrow"
 markAccent(browserEyebrow, "TextColor3", true)
-local sectionTitle = label(browserHeader, "Main", 25, C.white, {
+local sectionTitle = label(browserHeader, "Home", 25, C.white, {
     Position=UDim2.fromOffset(17,30), Size=UDim2.new(1,-34,0,34),
 })
 local sectionSub = label(browserHeader, "Select a module", 12, C.muted, {
@@ -260,7 +253,7 @@ make("UIListLayout", moduleScroll, {Padding=UDim.new(0,9), SortOrder=Enum.SortOr
 make("UIPadding", moduleScroll, {PaddingBottom=UDim.new(0,10), PaddingRight=UDim.new(0,4)})
 
 local inspector = make("Frame", window, {
-    Name="Inspector", Position=UDim2.fromOffset(340,56), Size=UDim2.new(1,-340,1,-86),
+    Name="Inspector", Position=UDim2.fromOffset(391,56), Size=UDim2.new(1,-391,1,-86),
     BackgroundColor3=C.panel, BorderSizePixel=0,
 })
 local inspectorTop = make("Frame", inspector, {
@@ -302,7 +295,7 @@ local statusDot = rounded(make("Frame", footer, {
     Position=UDim2.fromOffset(15,12), Size=UDim2.fromOffset(6,6),
     BackgroundColor3=C.green, BorderSizePixel=0,
 }), 3)
-label(footer, "READY   /   GUMBALL MENU", 11, C.muted, {
+label(footer, "READY   /   UI PROTOTYPE", 11, C.muted, {
     Position=UDim2.fromOffset(29,2), Size=UDim2.new(1,-180,1,-4),
 })
 local hotkeyText = label(footer, "RIGHTSHIFT  /  TOGGLE", 11, C.faint, {
@@ -329,28 +322,20 @@ stroked(toast, C.line)
 
 local function notify(message)
     if not alive or not screen.Parent then return end
-    toastGeneration += 1
+    toastGeneration = toastGeneration + 1
     local generation = toastGeneration
-    if toastTask then pcall(task.cancel, toastTask); toastTask = nil end
-    if toastComplete then toastComplete:Disconnect(); toastComplete = nil end
-    if toastTween then toastTween:Cancel(); toastTween = nil end
     toast.Text = tostring(message)
     toast.Visible = true
     toast.TextTransparency = 0
     toast.BackgroundTransparency = 0
-    toastTask = task.delay(2.2, function()
-        toastTask = nil
+    task.delay(2.2, function()
         if not alive or generation ~= toastGeneration or not toast.Parent then return end
         local animation = TweenService:Create(toast, TweenInfo.new(.25), {
             TextTransparency=1, BackgroundTransparency=1,
         })
-        toastTween = animation
-        toastComplete = animation.Completed:Connect(function()
-            if alive and generation == toastGeneration then toast.Visible = false end
-            if toastTween == animation then toastTween = nil end
-            if toastComplete then toastComplete:Disconnect(); toastComplete = nil end
-        end)
         animation:Play()
+        animation.Completed:Wait()
+        if alive and generation == toastGeneration then toast.Visible=false end
     end)
 end
 local function emit(id, key, value)
@@ -361,53 +346,48 @@ local function emit(id, key, value)
 end
 local function moduleState(id)
     if not states[id] then
-        states[id] = {enabled=false, strength=50, indicator=false, mode="Standard"}
+        states[id] = {enabled=false, strength=50, indicator=false, mode="Standard", theme="Amber"}
     end
     return states[id]
 end
--- Fixed dark palette: there are no theme-switching controls.
+local function updateAccent(color)
+    C.accent = color
+    for _,object in ipairs(screen:GetDescendants()) do
+        local prop = object:GetAttribute("GumballAccentProperty")
+        if prop then
+            pcall(function() object[prop] = color end)
+        end
+    end
+end
 
 local navButtons = {}
 local function refreshNavigation()
     for sectionId, entry in pairs(navButtons) do
         local selected = sectionId == activeSection
-        entry.button.BackgroundColor3 = selected and C.raised or C.rail
-        entry.button.TextColor3 = selected and C.white or C.muted
-        entry.bar.Visible = selected
+        entry.button.BackgroundColor3 = selected and C.tile or C.rail
+        entry.title.TextColor3 = selected and C.white or C.muted
         markAccent(entry.bar, "BackgroundColor3", selected, C.rail)
+        entry.bar.Visible = selected
     end
 end
 for index, section in ipairs(sections) do
-    local labelWidth = math.max(49, #section.label * 8 + 21)
-    local button = textButton(tabScroll, section.label, {
-        Name="Tab_" .. section.id, LayoutOrder=index,
-        Size=UDim2.fromOffset(labelWidth,34), TextSize=13,
-        BackgroundColor3=C.rail, TextColor3=C.muted,
+    local button = textButton(railScroll, "", {
+        Name=section.id, LayoutOrder=index, Size=UDim2.new(1,0,0,47),
+        BackgroundColor3=C.rail,
     })
-    local underline = rounded(make("Frame", button, {
-        Name="ActiveUnderline", AnchorPoint=Vector2.new(.5,1),
-        Position=UDim2.new(.5,0,1,0), Size=UDim2.new(1,-16,0,3),
+    local selectedBar = rounded(make("Frame", button, {
+        Position=UDim2.fromOffset(0,8), Size=UDim2.fromOffset(3,31),
         BackgroundColor3=C.accent, BorderSizePixel=0, Visible=false,
-    }), 2)
-    navButtons[section.id] = {button=button, bar=underline}
-end
-
-local function revealActiveTab()
-    task.defer(function()
-        if not alive or not tabScroll.Parent then return end
-        local entry = navButtons[activeSection]
-        if not entry then return end
-        local button = entry.button
-        local left = button.AbsolutePosition.X - tabScroll.AbsolutePosition.X + tabScroll.CanvasPosition.X
-        local right = left + button.AbsoluteSize.X
-        local viewLeft = tabScroll.CanvasPosition.X
-        local viewRight = viewLeft + tabScroll.AbsoluteSize.X
-        if left < viewLeft then
-            tabScroll.CanvasPosition = Vector2.new(math.max(0,left-4),0)
-        elseif right > viewRight then
-            tabScroll.CanvasPosition = Vector2.new(math.max(0,right-tabScroll.AbsoluteSize.X+4),0)
-        end
-    end)
+    }), 3)
+    local short = label(button, section.code, 18, C.muted, {
+        Position=UDim2.fromOffset(3,1), Size=UDim2.new(1,-6,0,26),
+        TextXAlignment=Enum.TextXAlignment.Center,
+    })
+    local name = label(button, string.upper(section.label), 9, C.faint, {
+        Position=UDim2.fromOffset(2,28), Size=UDim2.new(1,-4,0,13),
+        TextXAlignment=Enum.TextXAlignment.Center,
+    })
+    navButtons[section.id] = {button=button, bar=selectedBar, title=short, sub=name}
 end
 
 local function sectionModules()
@@ -603,24 +583,26 @@ renderInspector = function(module)
     inspectDetail.Text = module.detail
     inspectScroll.CanvasPosition = Vector2.new(0,0)
 
-    if module.id == "welcome" or module.id == "roadmap" then
-        informationCard("Gumball Control Deck", "Compact top tabs, searchable feature library, and a dedicated settings inspector. No copied Kicia or UE interface.", 122)
+    if module.section == "Home" then
+        informationCard("A new layout", "A vertical section rail, searchable module library, and focused settings inspector. No copied Kicia or UE interface.", 122)
         informationCard("What works now", "Navigation, search, module selection, demo toggles, demo sliders, appearance settings, drag, hide/show, and mobile navigation.", 122)
         informationCard("What comes next", "We will implement features one at a time. None of the preview controls modify Roblox gameplay yet.", 115)
         actionCard("Test the notification system", "SHOW TEST MESSAGE", function()
             notify("Gumball Control Deck is ready")
         end)
     elseif module.id == "appearance" then
-        informationCard("Dark theme", "The interface uses a single graphite-and-white dark theme. There are no other theme presets.", 113)
-        toggleCard("Compact module cards", "Reduce spacing between feature cards.", "compact")
-        informationCard("Tab indicator", "The active tab has a brighter background and a clear underline. Swipe the top row to see more tabs on mobile.", 113)
+        choiceCard("Accent palette", "Choose the interface highlight color.", "theme", {"Amber","Mint","Rose"}, function(theme)
+            updateAccent(accentPalettes[theme])
+        end)
+        toggleCard("Compact mode", "Reduce spacing between module tiles.", "compact")
+        informationCard("Interface style", "Matte graphite, clean type, amber accents, and focused one-module-at-a-time editing.", 113)
     elseif module.id == "session" then
-        actionCard("Completely stop Gumball", "Unload Gumball", function()
+        informationCard("Session controls", "The menu is independent of Kicia and UE. Unload destroys the UI and disconnects its input listeners.", 113)
+        actionCard("Hide the interface", "HIDE MENU", function() window.Visible=false end)
+        actionCard("Remove the interface", "UNLOAD GUMBALL UI", function()
             local api = env.GumballControlDeck
             if api and api.Unload then api.Unload() end
         end)
-        actionCard("Hide the interface", "HIDE MENU", function() window.Visible=false end)
-        informationCard("Session controls", "Unload Gumball stops this standalone menu, cancels its pending notifications, disconnects its listeners, runs registered cleanup callbacks, and destroys the interface.", 134)
     else
         informationCard("PREVIEW MODE", "These controls demonstrate the layout. Their values are saved in this session but are not connected to gameplay.", 103)
         toggleCard("Module enabled", "Demonstration on/off control.", "enabled")
@@ -634,7 +616,7 @@ renderBrowser = function()
     disconnectBrowser()
     clearObjects(moduleScroll)
     sectionTitle.Text = activeSection
-    sectionSub.Text = activeSection == "Main" and "Welcome to Gumball" or "Choose a module to inspect"
+    sectionSub.Text = activeSection == "Home" and "Welcome to the Control Deck" or "Choose a module to inspect"
     moduleScroll.CanvasPosition = Vector2.new(0,0)
     local results = sectionModules()
     if #results == 0 then
@@ -691,7 +673,6 @@ local function selectSection(sectionId)
     end
     activeModule = first
     refreshNavigation()
-    revealActiveTab()
     renderBrowser()
     renderInspector(first)
     setMobileView("browser")
@@ -712,12 +693,15 @@ applyResponsive = function()
     local width = math.min(860, math.max(290, view.X-22))
     local height = math.min(540, math.max(310, view.Y-26))
     local small = width < 650
-    local browserWidth = small and width or math.floor(width*.405)
+    local navWidth = small and 56 or 78
+    local browserWidth = small and width-navWidth or math.floor((width-navWidth)*.40)
     window.Size = UDim2.fromOffset(width,height)
-    browser.Position = UDim2.fromOffset(0,56)
+    rail.Size = UDim2.new(0,navWidth,1,-86)
+    window.RailDivider.Position = UDim2.fromOffset(navWidth-1,56)
+    browser.Position = UDim2.fromOffset(navWidth,56)
     browser.Size = UDim2.new(0,browserWidth,1,-86)
-    inspector.Position = UDim2.fromOffset(small and 0 or browserWidth,56)
-    inspector.Size = UDim2.new(0,small and width or width-browserWidth,1,-86)
+    inspector.Position = UDim2.fromOffset(small and navWidth or navWidth+browserWidth,56)
+    inspector.Size = UDim2.new(0,small and width-navWidth or width-navWidth-browserWidth,1,-86)
     browser.Visible = not (small and mobileView=="inspector")
     inspector.Visible = not (small and mobileView=="browser")
     back.Visible = small
@@ -725,19 +709,25 @@ applyResponsive = function()
     inspectEyebrow.Size = UDim2.new(1,small and -99 or -38,0,20)
     hotkeyText.Text = small and "G  /  TOGGLE" or "RIGHTSHIFT  /  TOGGLE"
     mobileToggle.Visible = UserInputService.TouchEnabled and not UserInputService.KeyboardEnabled
-
-    local titleWidth = small and 112 or 156
-    local hideWidth = small and 49 or 68
-    dragHandle.Size = UDim2.fromOffset(titleWidth,56)
-    logo.TextSize = small and 22 or 27
-    logo.Position = UDim2.fromOffset(small and 9 or 17,5)
-    logo.Size = UDim2.fromOffset(small and 92 or 125,43)
-    dot.Visible = not small
-    hide.Size = UDim2.fromOffset(hideWidth,30)
-    hide.Position = UDim2.new(1,small and -7 or -14,.5,0)
-    hide.Text = small and "-" or "HIDE"
-    tabScroll.Position = UDim2.fromOffset(titleWidth,4)
-    tabScroll.Size = UDim2.new(1,-titleWidth-hideWidth-(small and 17 or 26),0,48)
+    dragHandle.Size = UDim2.new(1,-96,1,0)
+    local titleSize = small and 23 or 27
+    logo.TextSize = titleSize
+    logo.Size = UDim2.fromOffset(small and 137 or 174,44)
+    dot.Position = UDim2.fromOffset(small and 136 or 163,22)
+    local descriptor = dragHandle:FindFirstChild("DeckDescriptor")
+    if descriptor then descriptor.Visible = not small end
+    for _,entry in pairs(navButtons) do
+        entry.sub.Visible = not small
+        entry.title.Position = UDim2.fromOffset(3,small and 10 or 1)
+        entry.button.Size = UDim2.new(1,0,0,small and 42 or 47)
+    end
+end
+-- The descriptor is optional on narrow screens.
+for _,child in ipairs(dragHandle:GetChildren()) do
+    if child:IsA("TextLabel") and child.Text == "CONTROL DECK  /  01" then
+        child.Name = "DeckDescriptor"
+        break
+    end
 end
 
 local cameraConnection = nil
@@ -798,29 +788,19 @@ local api = {}
 api.Gui = screen
 api.Window = window
 api.States = states
-function api.SetVisible(value)
-    if not alive then return end
-    setVisible(value)
-end
-function api.GetState(id)
-    if not alive then return nil end
-    return moduleState(id)
-end
+function api.SetVisible(value) setVisible(value) end
+function api.GetState(id) return moduleState(id) end
 function api.OnChange(callback)
     assert(type(callback)=="function", "OnChange requires a function")
-    if not alive then return false end
     table.insert(changeListeners,callback)
-    return true
 end
 function api.SelectSection(sectionId)
-    if not alive then return false end
     for _,section in ipairs(sections) do
         if section.id == sectionId then selectSection(sectionId); return true end
     end
     return false
 end
 function api.AddModule(module)
-    if not alive then return false end
     assert(type(module)=="table" and type(module.id)=="string" and type(module.title)=="string", "Invalid module")
     local valid = false
     for _,section in ipairs(sections) do
@@ -836,55 +816,21 @@ function api.AddModule(module)
     if module.section == activeSection then renderBrowser() end
     return true
 end
--- Feature code added later can register its own connections and cleanup here.
--- This lets Unload Gumball stop future feature loops as well as the UI.
-function api.RegisterCleanup(callback)
-    assert(type(callback)=="function", "RegisterCleanup requires a function")
-    if not alive then pcall(callback); return false end
-    table.insert(cleanupHandlers,callback)
-    return true
-end
-function api.TrackConnection(connection)
-    if not alive then
-        pcall(function() connection:Disconnect() end)
-        return nil
-    end
-    table.insert(globalConnections,connection)
-    return connection
-end
-function api.TrackTask(thread)
-    if not alive then
-        pcall(task.cancel, thread)
-        return nil
-    end
-    table.insert(cleanupHandlers,function() pcall(task.cancel, thread) end)
-    return thread
-end
 function api.Unload()
     if not alive then return end
     alive = false
-    toastGeneration += 1
-    if toastTask then pcall(task.cancel,toastTask); toastTask=nil end
-    if toastComplete then pcall(function() toastComplete:Disconnect() end); toastComplete=nil end
-    if toastTween then pcall(function() toastTween:Cancel() end); toastTween=nil end
-    for index=#cleanupHandlers,1,-1 do
-        pcall(cleanupHandlers[index])
-        cleanupHandlers[index]=nil
-    end
     disconnectInspector()
     disconnectBrowser()
     for _,connection in ipairs(globalConnections) do
         pcall(function() connection:Disconnect() end)
     end
     table.clear(globalConnections)
-    table.clear(changeListeners)
-    if cameraConnection then pcall(function() cameraConnection:Disconnect() end); cameraConnection=nil end
+    if cameraConnection then cameraConnection:Disconnect(); cameraConnection=nil end
     if screen.Parent then screen:Destroy() end
     if env.GumballControlDeck == api then env.GumballControlDeck = nil end
-    print("[Project Gumball] Unloaded completely.")
 end
 
 env.GumballControlDeck = api
-selectSection("Main")
+selectSection("Home")
 applyResponsive()
-print("[Project Gumball] Dark Control Deck ready. RightShift to toggle. UI-only prototype.")
+print("[Project Gumball] Control Deck UI ready. RightShift to toggle. UI-only prototype.")
